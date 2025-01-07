@@ -9,4 +9,6 @@ handle.on("data", (args) => {
 
 handle.on("error", (error) => {
     console.log(error);
-})
+});
+
+handle.emit("data", []);
