@@ -1,3 +1,4 @@
-end it
-fix it
-test it
+make the socket reconnect if error happens
+make the client clean cache if can
+make the code understart events without class
+check if message has been send correctly

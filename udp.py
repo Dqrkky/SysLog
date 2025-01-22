@@ -1,7 +1,7 @@
 import socket
 import time
 
-target_ip = "localhost"
+target_ip = "192.168.31.107"
 target_port = 514
 message = "PING"
 
