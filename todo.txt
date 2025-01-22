@@ -1,4 +1,9 @@
 make the socket reconnect if error happens
 make the client clean cache if can
 make the code understart events without class
-check if message has been send correctly
+check if message has been send correctly to client
+check if client is still online
+check if client ip is valid
+cleck if client port is valid
+check if client can receibe messages
+make a udp client
