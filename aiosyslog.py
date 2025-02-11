@@ -90,6 +90,7 @@ class SyslogServerProtocol(asyncio.DatagramProtocol):
         print(type(exc))
         asyncio.create_task(self.server.trigger_event("on_error", SysLogError(exc=exc)))
     def connection_lost(self, exc):
+        print(type(exc))
         asyncio.create_task(self.server.trigger_event("on_connection_lost", SysLogConnectionLost(exc=exc)))
     def pause_writing(self):
         asyncio.create_task(self.server.trigger_event("on_pause_writing", SysLogPauseWriting()))

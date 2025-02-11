@@ -1,15 +1,25 @@
 import aiosyslog
 import json
+import os
 
 client = aiosyslog.SysLogServer()
 
+
+def printJson(js0n :dict=None):
+    if js0n != None and isinstance(js0n, dict):  # noqa: E711
+        os.system("cls")
+        print(json.dumps(
+            obj=js0n,
+            indent=4
+        ))
+
 @client.event
 async def on_start(ctx :aiosyslog.SysLogStart):
-    print(f"Server Started: {ctx.__dict__}")
+    printJson({"SysLogStart": ctx.__dict__})
 
 @client.event
 async def on_stop(ctx :aiosyslog.SysLogStop):
-    print(f"Server Stoped: {ctx.__dict__}")
+    printJson({"SysLogStop": ctx.__dict__})
 
 @client.event
 async def on_message(ctx :aiosyslog.SysLogMessage):
@@ -24,26 +34,26 @@ async def on_message(ctx :aiosyslog.SysLogMessage):
         "headers": message[:jsi],
         "data": json.loads(s=message[jsi:])
     }
-    print(data)
+    printJson({"SysLogMessage": data})
 
 @client.event
 async def on_connection(ctx :aiosyslog.SysLogConnection):
-    print(f"Connection: {ctx.__dict__}")
+    printJson({"SysLogConnection": ctx.__dict__})
 
 @client.event
 async def on_connection_lost(ctx :aiosyslog.SysLogConnectionLost):
-    print(f"Connection Error: {ctx.__dict__}")
+    printJson({"SysLogConnectionLost": ctx.__dict__})
 
 @client.event
 async def on_error(ctx :aiosyslog.SysLogError):
-    print(f"Error: {ctx.__dict__}")
+    printJson({"SysLogError": ctx.__dict__})
 
 @client.event
 async def on_pause_writing(ctx :aiosyslog.SysLogPauseWriting):
-    print(f"Pause Writing: {ctx.__dict__}")
+    printJson({"SysLogPauseWriting": ctx.__dict__})
 
 @client.event
 async def on_resume_writing(ctx :aiosyslog.SysLogResumeWriting):
-    print(f"Pause Writing: {ctx.__dict__}")
+    printJson({"SysLogResumeWriting": ctx.__dict__})
 
 client.run()
