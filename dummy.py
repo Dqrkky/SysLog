@@ -4,7 +4,6 @@ import os
 
 client = aiosyslog.SysLogServer()
 
-
 def printJson(js0n :dict=None):
     if js0n != None and isinstance(js0n, dict):  # noqa: E711
         os.system("cls")
