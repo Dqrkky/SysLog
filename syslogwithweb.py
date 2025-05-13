@@ -1,18 +1,19 @@
-import socket, json
-from flask import Flask, jsonify
+import socket
+import json
+import threading
+import queue
+from flask import Flask, jsonify, Response
 
-# Flask app setup
 app = Flask(__name__)
 
-# Shared variable to store received messages (simple example)
-received_messages = []
+# Thread-safe queue to store incoming messages
+message_queue = queue.Queue()
+message_history = []
 
-# UDP Listener Function
-def udp_listener(host :str="0.0.0.0", port :int=514):
-    global received_messages
-    # Set up UDP socket
+def udp_listener(host="0.0.0.0", port=514):
+    """Listens for incoming UDP messages and puts them in a queue."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((host, port)) # Listen on all interfaces on port
+    sock.bind((host, port))
     print(f"Listening for UDP messages on port {port}...")
     while True:
         message, addr = sock.recvfrom(4096)
@@ -20,20 +21,31 @@ def udp_listener(host :str="0.0.0.0", port :int=514):
         jsi = message.find('{')
         data = {
             "headers": message[:jsi],
-            "data": json.loads(s=message[jsi:])
+            "data": json.loads(message[jsi:])
         }
-        received_messages.append({"data": data, "address": addr})
+        entry = {"data": data, "address": addr}
+        message_queue.put(entry)
+        message_history.append(entry)
 
-# Flask Route to Display Received Messages
 @app.route('/messages', methods=['GET'])
 def get_messages():
-    return jsonify(received_messages)
+    return jsonify(message_history)
+
+def event_stream():
+    """Generator function to stream messages in real time."""
+    while True:
+        message = message_queue.get()
+        yield f"data: {json.dumps(message)}\n\n"
+
+@app.route('/stream', methods=['GET'])
+def stream():
+    """SSE endpoint for real-time message streaming."""
+    return Response(event_stream(), content_type='text/event-stream')
 
 if __name__ == "__main__":
-    # Start the UDP listener in a separate thread
-    import threading
+    # Start UDP listener in a separate thread
     listener_thread = threading.Thread(target=udp_listener, daemon=True)
     listener_thread.start()
 
-    # Run the Flask app
-    app.run(host="0.0.0.0", port=5000)  # Flask runs on HTTP port 5000
+    # Run Flask app
+    app.run(host="0.0.0.0", port=5000, threaded=True)

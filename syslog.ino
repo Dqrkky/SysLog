@@ -1,8 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-
-const char* ssid = "";
-const char* password = "";
+#include <credentials.h>
 
 WiFiUDP udp;
 unsigned int localUdpPort = 514;
@@ -36,9 +34,9 @@ void loop() {
         Serial.printf("Received packet of size %d from %s:%d\n", packetSize, udp.remoteIP().toString().c_str(), udp.remotePort());
         Serial.printf("Packet content: %s\n", incomingPacket);
         digitalWrite(builtinled, LOW);
-        delay(100);
+        delay(50);
         digitalWrite(builtinled, HIGH);
-        delay(100);
+        delay(50);
     }
     delay(10);
 }
